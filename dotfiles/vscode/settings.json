@@ -1,0 +1,114 @@
+{
+  "editor.tabSize": 2,
+  "editor.fontSize": 17,
+  "editor.lineHeight": 23,
+  "editor.fontFamily": "'MartianMono Nerd Font', 'JetBrainsMono Nerd Font', Consolas, 'Courier New', monospace",
+  "editor.semanticHighlighting.enabled": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.minimap.enabled": false,
+  "editor.folding": true,
+  "editor.foldingStrategy": "indentation",
+
+  "files.trimTrailingWhitespace": true,
+  "explorer.compactFolders": false,
+  "workbench.colorTheme": "Bifröst Night Flat",
+  "workbench.startupEditor": "none",
+  "workbench.activityBar.location": "top",
+
+  "editor.semanticTokenColorCustomizations": {
+    "enabled": true,
+    "[Bifröst]": {
+      "enabled": true,
+      "rules": {}
+    }
+  },
+
+  "debug.allowBreakpointsEverywhere": true,
+  "terminal.integrated.minimumContrastRatio": 1,
+  "terminal.integrated.fontSize": 16,
+  "window.customTitleBarVisibility": "auto",
+
+  "gopls": {
+    "ui.semanticTokens": true
+  },
+
+  "files.associations": {
+    "**/.i3/config": "i3",
+    "**/i3/config": "i3"
+  },
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  },
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  },
+
+  "[go]": {
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  "[c]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+
+  "[cpp]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+
+  "[css]": {
+    "editor.defaultFormatter": "vscode.css-language-features"
+  },
+
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[json][jsonc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "search.exclude": {
+    "package-lock.json": true
+  },
+
+  "github.copilot.preferredAccount": "TheCodeTherapy",
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+
+  "zig.path": "zig",
+
+  "cmake.options.statusBarVisibility": "visible",
+  "cmake.showOptionsMovedNotification": false,
+  "cmake.pinnedCommands": [
+    "workbench.action.tasks.configureTaskRunner",
+    "workbench.action.tasks.runTask"
+  ],
+  "clangd.path": "C:\\Program Files\\LLVM\\bin\\clangd.exe",
+  "glsllint.glslangValidatorPath": "C:\\tools\\glslang\\bin\\glslangValidator.exe",
+  "zig.zls.enabled": "on",
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
+  "workbench.iconTheme": "catppuccin-mocha",
+  "editor.unicodeHighlight.nonBasicASCII": false,
+  "security.workspace.trust.untrustedFiles": "open"
+}
