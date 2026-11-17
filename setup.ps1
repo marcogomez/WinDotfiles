@@ -31,6 +31,7 @@ $wingetPackages = @(
   "JanDeDobbeleer.OhMyPosh",
   "LLVM.LLVM",
   "AuthorSoftware.NVMWindows",
+  "pnpm.pnpm",
   "JesseDuffield.lazygit",
   "sharkdp.fd",
   "junegunn.fzf",

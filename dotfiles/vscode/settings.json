@@ -110,5 +110,6 @@
   ],
   "workbench.iconTheme": "catppuccin-mocha",
   "editor.unicodeHighlight.nonBasicASCII": false,
-  "security.workspace.trust.untrustedFiles": "open"
+  "security.workspace.trust.untrustedFiles": "open",
+  "remote.autoForwardPortsSource": "hybrid"
 }
