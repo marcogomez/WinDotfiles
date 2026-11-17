@@ -277,6 +277,83 @@ function Install-DockerDesktop {
   }
 }
 
+# 🔹 OpenSSH server: install it, keep it running, open the firewall, and make
+# key auth read ~\.ssh\authorized_keys.
+# WSL is reached by jumping through this server (WSL's sshd listens on 2222,
+# which WSL forwards to Windows localhost; see wsl-dotfiles install_sshd.sh):
+#   ssh -J <user>@<this-host> -p 2222 <user>@127.0.0.1
+function Enable-OpenSshServer {
+  if (Get-Service sshd -ErrorAction SilentlyContinue) {
+    Write-Host "✅ OpenSSH Server is already installed."
+  }
+  else {
+    Write-Host "📦 Installing OpenSSH Server..."
+    # dism.exe rather than Add-WindowsCapability: the DISM cmdlets fail with
+    # "Class not registered" inside the Store (MSIX) build of PowerShell 7.
+    # This downloads from Windows Update and can take a few minutes.
+    dism.exe /Online /Add-Capability /CapabilityName:OpenSSH.Server~~~~0.0.1.0 /NoRestart
+    if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) {
+      Write-Host "❌ Failed to install OpenSSH Server (dism exit code $LASTEXITCODE)." -ForegroundColor Red
+      return
+    }
+    if (-Not (Get-Service sshd -ErrorAction SilentlyContinue)) {
+      Write-Host "❌ OpenSSH Server was installed but the sshd service is missing. A reboot may be pending." -ForegroundColor Red
+      return
+    }
+    Write-Host "✅ OpenSSH Server installed."
+  }
+
+  if ((Get-Service sshd).StartType -ne "Automatic") {
+    Write-Host "🔧 Setting the sshd service to start automatically..."
+    Set-Service sshd -StartupType Automatic
+  }
+  # The first start is what generates sshd_config and the host keys
+  if ((Get-Service sshd).Status -ne "Running") {
+    Write-Host "🔧 Starting the sshd service..."
+    Start-Service sshd
+  }
+
+  # By default sshd ignores ~\.ssh\authorized_keys for members of the
+  # Administrators group and reads ProgramData\ssh\administrators_authorized_keys
+  # instead. Comment that override out so the user's own file is the only one.
+  $sshdConfig = Join-Path $env:ProgramData "ssh\sshd_config"
+  $adminOverride = '^\s*(Match\s+Group\s+administrators|AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)\s*$'
+  if (-Not (Test-Path $sshdConfig)) {
+    Write-Host "⚠️ $sshdConfig not found. Skipping the authorized_keys fix." -ForegroundColor Yellow
+  }
+  else {
+    $lines = @(Get-Content $sshdConfig)
+    if ($lines -match $adminOverride) {
+      Write-Host "🔧 Pointing sshd at ~\.ssh\authorized_keys for administrators..."
+      $lines | ForEach-Object { if ($_ -match $adminOverride) { "#$_" } else { $_ } } |
+        Set-Content -Path $sshdConfig -Encoding ascii
+      Restart-Service sshd
+      Write-Host "✅ sshd_config updated and sshd restarted."
+    }
+    else {
+      Write-Host "✅ sshd already reads ~\.ssh\authorized_keys for administrators."
+    }
+  }
+
+  $ruleName = "OpenSSH-Server-In-TCP"
+  $rule = Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue
+  if (-Not $rule) {
+    Write-Host "🔧 Creating firewall rule for sshd (TCP 22, Private networks)..."
+    New-NetFirewallRule -Name $ruleName -DisplayName "OpenSSH Server (sshd)" -Direction Inbound -Protocol TCP -LocalPort 22 -Action Allow -Profile Private | Out-Null
+  }
+  elseif ("$($rule.Enabled)" -ne "True") {
+    Write-Host "🔧 Enabling firewall rule $ruleName..."
+    Enable-NetFirewallRule -Name $ruleName
+  }
+  else {
+    Write-Host "✅ Firewall rule $ruleName is already enabled."
+  }
+
+  if (-Not (Test-Path "$env:USERPROFILE\.ssh\authorized_keys")) {
+    Write-Host "⚠️ $env:USERPROFILE\.ssh\authorized_keys does not exist. Add your public key there to log in with a key." -ForegroundColor Yellow
+  }
+}
+
 if ($isAdmin) {
   Write-Host "🔸 Installing packages..."
   Install-Winget-Packages
@@ -284,6 +361,7 @@ if ($isAdmin) {
   Add-DotfilesBinToPath
   Disable-Hibernation
   Install-DockerDesktop
+  Enable-OpenSshServer
 }
 
 $ps7ProfileDir = Split-Path $ps7Profile -Parent
